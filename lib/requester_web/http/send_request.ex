@@ -49,6 +49,7 @@ defmodule RequesterWeb.Http.SendRequest do
   end
 
   def process_lyrics(lyrics) do
+    lyrics = String.replace(lyrics, "\r", "")
     length = lyrics
     |> String.length()
 
