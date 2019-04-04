@@ -1,21 +1,63 @@
 defmodule RequesterWeb.Http.SendRequest do
-  @api_url "https://orion.apiseeds.com/api/music/lyric/"
+  @api_url "https://api.genius.com/search?q="
   @elchatto_url "https://app.elchatto.com/api/integrations"
 
   def get_lyrics(params) do
-    case HTTPoison.get(@api_url <> "#{params["artist"]}/#{params["song"]}?apikey=#{params["apikey"]}", [], [timeout: 30_000, recv_timeout: 30_000]) do
+    keyword = String.replace(params["song"], " ", "%20")
+    url = @api_url <> keyword
+    case HTTPoison.get(url, %{"Authorization" => "Bearer #{params["apikey"]}"}) do
       {:ok, %{status_code: 200, body: body}} ->
         body = Poison.decode!(body, keys: :atoms)
-        success_postback_elchatto(body, params)
-      {:ok, %{status_code: 404}} ->
-        not_found_postback_elchatto(params)
-      _ ->
-        error_postback_elchatto(params)
+
+        first_hit = body.response.hits
+        |> List.first()
+
+        song_data = fetch_song_data(first_hit.result.url)
+        success_postback_elchatto(song_data, params)
+      resp ->
+
+        IO.inspect resp
     end
   end
 
-  def success_postback_elchatto(resp_body, params) do
-    lyrics = process_lyrics(resp_body.result.track.text)
+  def fetch_song_data(url) do
+    {:ok, %{body: body}} = HTTPoison.get(url)
+
+    title = body
+    |> Floki.find(".header_with_cover_art-primary_info")
+    |> stringify_title_base()
+
+    lyrics = body
+    |> Floki.find(".lyrics")
+    |> Floki.find("p")
+    |> stringify_lyric_base()
+
+    %{title: title, lyrics: lyrics}
+   end
+
+  def stringify_lyric_base(lyric_base) do
+    Enum.map(lyric_base, fn
+      {_, _, lyrics} ->
+        stringify_lyric_base(lyrics)
+      ""<>lyric -> lyric<>"\n"
+      _ -> ""
+    end)
+    |> List.flatten
+    |> to_string
+  end
+
+  def stringify_title_base(title_base) do
+    Enum.map(title_base, fn
+      {_, _, title} ->
+        stringify_title_base(title)
+      ""<>title -> title<> "\n"
+      _ -> ""
+    end)
+    |> List.flatten
+  end
+
+  def success_postback_elchatto(song_data, params) do
+    lyrics = process_lyrics(song_data.lyrics)
     body = %{
       token: params["integration_token"],
       chatbot_id: params["bot_id"],
@@ -24,23 +66,11 @@ defmodule RequesterWeb.Http.SendRequest do
       attributes: [
         %{
           name: "artist_name",
-          value: resp_body.result.artist.name
+          value: Enum.at(song_data.title, 1)
         },
         %{
           name: "song",
-          value: resp_body.result.track.name
-        },
-        %{
-          name: "notice",
-          value: resp_body.result.copyright.notice
-        },
-        %{
-          name: "copyright",
-          value: resp_body.result.copyright.artist
-        },
-        %{
-          name: "copyright_message",
-          value: resp_body.result.copyright.text
+          value: Enum.at(song_data.title, 0)
         } | lyrics
       ]
     } |> Poison.encode!

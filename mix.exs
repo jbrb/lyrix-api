@@ -40,6 +40,7 @@ defmodule Requester.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:plug_cowboy, "~> 1.0"},
+      {:floki, "~> 0.20.4"},
       {:httpoison, "~> 1.0"}
     ]
   end
