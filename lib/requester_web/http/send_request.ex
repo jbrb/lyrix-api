@@ -50,7 +50,7 @@ defmodule RequesterWeb.Http.SendRequest do
     Enum.map(title_base, fn
       {_, _, title} ->
         stringify_title_base(title)
-      ""<>title -> title<> "\n"
+      ""<>title -> title
       _ -> ""
     end)
     |> List.flatten
