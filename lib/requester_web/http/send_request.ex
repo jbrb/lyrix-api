@@ -9,14 +9,14 @@ defmodule RequesterWeb.Http.SendRequest do
       {:ok, %{status_code: 200, body: body}} ->
         body = Poison.decode!(body, keys: :atoms)
 
-        first_hit = body.response.hits
-        |> List.first()
-
-        song_data = fetch_song_data(first_hit.result.url)
-        success_postback_elchatto(song_data, params)
-      resp ->
-
-        IO.inspect resp
+        case List.first(body.response.hits) do
+          nil -> not_found_postback_elchatto(params)
+          first_hit ->
+            song_data = fetch_song_data(first_hit.result.url)
+            success_postback_elchatto(song_data, params)
+        end
+      _ ->
+        error_postback_elchatto(params)
     end
   end
 
