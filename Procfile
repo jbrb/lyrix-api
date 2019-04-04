@@ -1,2 +1,1 @@
-web: mix ecto.create
-web: mix ecto.create,MIX_ENV=prod mix phx.server
+web: mix ecto.reset && MIX_ENV=prod mix phx.server
