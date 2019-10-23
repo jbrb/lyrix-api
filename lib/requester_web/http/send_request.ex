@@ -63,6 +63,7 @@ defmodule RequesterWeb.Http.SendRequest do
       chatbot_id: params["bot_id"],
       component_id: params["success_block"],
       messenger_user_id: params["messenger_user_id"],
+      type: "block",
       attributes: [
         %{
           name: "artist_name",
@@ -117,7 +118,8 @@ defmodule RequesterWeb.Http.SendRequest do
       token: params["integration_token"],
       chatbot_id: params["bot_id"],
       component_id: params["not_found_block"],
-      messenger_user_id: params["messenger_user_id"]
+      messenger_user_id: params["messenger_user_id"],
+      type: "block"
     } |> Poison.encode!
     headers = ["Content-Type": "Application/json"]
     HTTPoison.post(@elchatto_url, body, headers, [timeout: 30_000, recv_timeout: 30_000])
@@ -128,7 +130,8 @@ defmodule RequesterWeb.Http.SendRequest do
       token: params["integration_token"],
       chatbot_id: params["bot_id"],
       component_id: params["error_block"],
-      messenger_user_id: params["messenger_user_id"]
+      messenger_user_id: params["messenger_user_id"],
+      type: "block"
     } |> Poison.encode!
     headers = ["Content-Type": "Application/json"]
     HTTPoison.post(@elchatto_url, body, headers, [timeout: 30_000, recv_timeout: 30_000])
