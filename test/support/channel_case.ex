@@ -26,7 +26,6 @@ defmodule RequesterWeb.ChannelCase do
     end
   end
 
-
   setup tags do
     :ok = Sandbox.checkout(Requester.Repo)
     unless tags[:async] do
