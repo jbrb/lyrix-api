@@ -1,4 +1,5 @@
 defmodule RequesterWeb.ConnCase do
+  alias Ecto.Adapters.SQL.Sandbox
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -28,9 +29,9 @@ defmodule RequesterWeb.ConnCase do
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Requester.Repo)
+    :ok = Sandbox.checkout(Requester.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Requester.Repo, {:shared, self()})
+      Sandbox.mode(Requester.Repo, {:shared, self()})
     end
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
