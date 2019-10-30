@@ -39,7 +39,7 @@ defmodule RequesterWeb.Http.SendRequest do
     Enum.map(lyric_base, fn
       {_, _, lyrics} ->
         stringify_lyric_base(lyrics)
-      ""<>lyric -> lyric<>"\n"
+      "" <> lyric -> lyric <> "\n"
       _ -> ""
     end)
     |> List.flatten
@@ -50,7 +50,7 @@ defmodule RequesterWeb.Http.SendRequest do
     Enum.map(title_base, fn
       {_, _, title} ->
         stringify_title_base(title)
-      ""<>title -> title
+      "" <> title -> title
       _ -> ""
     end)
     |> List.flatten
