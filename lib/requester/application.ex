@@ -11,7 +11,8 @@ defmodule Requester.Application do
       # Start the Ecto repository
       # Start the endpoint when the application starts
       supervisor(RequesterWeb.Endpoint, []),
-      # Start your own worker by calling: Requester.Worker.start_link(arg1, arg2, arg3)
+      # Start your own worker by calling:
+      # Requester.Worker.start_link(arg1, arg2, arg3)
       # worker(Requester.Worker, [arg1, arg2, arg3]),
     ]
 
